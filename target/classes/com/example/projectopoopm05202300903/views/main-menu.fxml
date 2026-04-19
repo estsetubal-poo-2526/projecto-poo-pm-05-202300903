@@ -6,9 +6,9 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="720.0" prefWidth="1080.0" stylesheets="@style.css"
+<BorderPane prefHeight="720.0" prefWidth="1080.0" stylesheets="@../assets/style.css"
             xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.projectopoopm05202300903.MainMenuController">
+            fx:controller="com.example.projectopoopm05202300903.controllers.ElementalDuelsController">
 
     <center>
         <VBox alignment="CENTER" spacing="40.0" BorderPane.alignment="CENTER">

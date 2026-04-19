@@ -1,4 +1,4 @@
-package com.example.projectopoopm05202300903;
+package com.example.projectopoopm05202300903.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

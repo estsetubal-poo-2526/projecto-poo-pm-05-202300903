@@ -65,7 +65,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                com.example.projectopoopm05202300903/com.example.projectopoopm05202300903.MainApp
+                                com.example.projectopoopm05202300903/com.example.projectopoopm05202300903.ElementalDuelsApp
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
