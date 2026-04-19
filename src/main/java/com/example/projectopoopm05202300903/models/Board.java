@@ -1,11 +1,13 @@
 package com.example.projectopoopm05202300903.models;
 
+import com.example.projectopoopm05202300903.models.Card.UnitCard;
+import com.example.projectopoopm05202300903.models.Player.HumanPlayer;
+import com.example.projectopoopm05202300903.models.Player.Player;
+
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Board {
-
     private List<UnitCard> playerUnits;
     private List<UnitCard> pcUnits;
 
@@ -15,42 +17,16 @@ public class Board {
     }
 
     public void addUnit(Player player, UnitCard unit) {
-        if (player instanceof HumanPlayer) {
-            playerUnits.add(unit);
-        } else if (player instanceof AiPlayer) {
-            pcUnits.add(unit);
-        }
+        playerUnits.add(unit);
     }
 
     public void removeDeadUnits() {
-        Iterator<UnitCard> playerIterator = playerUnits.iterator();
-        while (playerIterator.hasNext()) {
-            if (!playerIterator.next().isAlive()) {
-                playerIterator.remove();
-            }
-        }
-
-        Iterator<UnitCard> pcIterator = pcUnits.iterator();
-        while (pcIterator.hasNext()) {
-            if (!pcIterator.next().isAlive()) {
-                pcIterator.remove();
-            }
-        }
+        playerUnits.removeIf(unitCard -> !unitCard.isAlive());
     }
 
-    public List<UnitCard> getUnits(Player player) {
-        if (player instanceof HumanPlayer) {
-            return playerUnits;
-        } else {
-            return pcUnits;
-        }
-    }
+    public List<UnitCard> getPlayerUnits() {return List.copyOf(playerUnits); }
 
-    public List<UnitCard> getPlayerUnits() {
-        return playerUnits;
-    }
-
-    public List<UnitCard> getPcUnits() {
-        return pcUnits;
+    public List<UnitCard> getPCUnits() {
+        return List.copyOf(pcUnits);
     }
 }

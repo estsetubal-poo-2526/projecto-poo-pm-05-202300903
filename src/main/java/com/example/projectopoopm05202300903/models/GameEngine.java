@@ -1,14 +1,17 @@
 package com.example.projectopoopm05202300903.models;
 
-import com.example.projectopoopm05202300903.Exceptions.EmptyDeckException;
-import com.example.projectopoopm05202300903.interfaces.ITarget;
+import com.example.projectopoopm05202300903.models.interfaces.ITarget;
+import com.example.projectopoopm05202300903.models.Card.UnitCard;
+import com.example.projectopoopm05202300903.models.Player.AiPlayer;
+import com.example.projectopoopm05202300903.models.Player.HumanPlayer;
+import com.example.projectopoopm05202300903.models.Player.Player;
 
 import java.util.List;
 
 public class GameEngine {
+    private Board board;
     private HumanPlayer human;
     private AiPlayer pc;
-    private Board board;
     private Player currentPlayer;
     private int turnNumber;
     private boolean isGameOver;
@@ -17,92 +20,37 @@ public class GameEngine {
         this.human = human;
         this.pc = pc;
         this.board = new Board();
-        this.currentPlayer = human;
+        this.currentPlayer = human; // TODO: This should be random, if possible that the "AI" might start firsts
         this.turnNumber = 0;
         this.isGameOver = false;
-
-        this.pc.setBoard(board);
     }
 
     public void startGame() {
-        isGameOver = false;
-        turnNumber = 0;
-
-        human.getDeck().shuffle();
-        pc.getDeck().shuffle();
-
-        for (int i = 0; i < 3; i++) {
-            try {
-                human.getHand().addCard(human.getDeck().drawCard());
-                pc.getHand().addCard(pc.getDeck().drawCard());
-            } catch (EmptyDeckException e) {
-                isGameOver = true;
-                return;
-            }
-        }
-        turnNumber = 1;
-        currentPlayer = human;
-        human.executeTurn();
+        // TODO: Implement the game start
     }
 
     public void endCurrentTurn() {
-        if (isGameOver) return;
-        board.removeDeadUnits();
-
-        checkWinConditions();
-        if (isGameOver) return;
-
-        if (currentPlayer == human) {
-            resetUnitsAttackStatus(board.getPlayerUnits());
-
-            currentPlayer = pc;
-            pc.executeTurn();
-
-            board.removeDeadUnits();
-            checkWinConditions();
-            if (isGameOver) return;
-
-            resetUnitsAttackStatus(board.getPcUnits());
-
-            turnNumber++;
-            currentPlayer = human;
-            human.executeTurn();
-        }
+        // TODO: Implement the end game
     }
 
     public void checkWinConditions() {
-        if (!human.isAlive()) {
-            isGameOver = true;
-        }
-        if (!pc.isAlive()) {
-            isGameOver = true;
-        }
+        // TODO: Check if it's possible to simplify this function, or even this function is necessary
+//        if (!human.isAlive()) {
+//            isGameOver = true;
+//        }
+//        if (!pc.isAlive()) {
+//            isGameOver = true;
+//        }
     }
 
     public void processAttack(UnitCard attacker, ITarget target) {
-        if (isGameOver) return;
-
-        if (attacker.hasAttackedThisTurn() || !attacker.isAlive()) {
-            return;
-        }
-
-        attacker.attackTarget(target);
-
-        if (target instanceof UnitCard) {
-            UnitCard targetUnit = (UnitCard) target;
-            if (targetUnit.isAlive()) {
-                attacker.receiveDamage(targetUnit.getAttack());
-            }
-        }
-
-        board.removeDeadUnits();
-        checkWinConditions();
+        // TODO: Implement the attack process
     }
 
     private void resetUnitsAttackStatus(List<UnitCard> units) {
-        for (UnitCard unit : units) {
-            unit.resetAttackStatus();
-        }
+//        for (UnitCard unit : units) {
+//            unit.resetAttackStatus();
+//        }
     }
 
     public HumanPlayer getHuman() {
@@ -134,6 +82,7 @@ public class GameEngine {
     }
 
     public Player getWinner() {
+        // TODO: This function should be used inside the game initial loop
         if (!isGameOver) return null;
         if (!human.isAlive()) return pc;
         if (!pc.isAlive()) return human;

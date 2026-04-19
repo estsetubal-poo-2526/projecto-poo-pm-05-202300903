@@ -1,6 +1,7 @@
 package com.example.projectopoopm05202300903.models;
 
-import com.example.projectopoopm05202300903.Exceptions.EmptyDeckException;
+import com.example.projectopoopm05202300903.models.Exceptions.EmptyDeckException;
+import com.example.projectopoopm05202300903.models.Card.Card;
 
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +9,6 @@ import java.util.Stack;
 
 public class Deck {
     private Stack<Card> cards;
-
 
     public Deck() {
         this.cards = new Stack<>();
@@ -18,7 +18,6 @@ public class Deck {
         this.cards = new Stack<>();
         this.cards.addAll(cards);
     }
-
 
     public void shuffle() {
         Collections.shuffle(cards);

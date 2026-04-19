@@ -1,5 +1,7 @@
 package com.example.projectopoopm05202300903.models;
 
+import com.example.projectopoopm05202300903.models.Card.Card;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +31,9 @@ public class Hand {
     }
 
     public List<Card> getPlayableCards(int currentMana) {
-        return cards.stream()
+        // TODO: The final goal of this function is to grey out the cards that you can use
+        return cards
+                .stream()
                 .filter(card -> card.getManaCost() <= currentMana)
                 .collect(Collectors.toList());
     }
