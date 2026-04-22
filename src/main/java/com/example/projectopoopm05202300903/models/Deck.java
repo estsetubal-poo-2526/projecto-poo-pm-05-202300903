@@ -1,22 +1,16 @@
 package com.example.projectopoopm05202300903.models;
 
-import com.example.projectopoopm05202300903.models.Exceptions.EmptyDeckException;
-import com.example.projectopoopm05202300903.models.Card.Card;
+import com.example.projectopoopm05202300903.models.card.Card;
+import com.example.projectopoopm05202300903.models.exceptions.EmptyDeckException;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Stack;
 
 public class Deck {
-    private Stack<Card> cards;
+    private final Stack<Card> cards = new Stack<>();
 
-    public Deck() {
-        this.cards = new Stack<>();
-    }
-
-    public Deck(List<Card> cards) {
-        this.cards = new Stack<>();
-        this.cards.addAll(cards);
+    public void addCard(Card card) {
+        cards.push(card);
     }
 
     public void shuffle() {
@@ -24,21 +18,10 @@ public class Deck {
     }
 
     public Card drawCard() throws EmptyDeckException {
-        if (cards.isEmpty()) {
-            throw new EmptyDeckException();
-        }
+        if (cards.isEmpty()) throw new EmptyDeckException("O baralho está vazio!");
         return cards.pop();
     }
 
-    public int getRemainingCardsCount() {
-        return cards.size();
-    }
-
-    public boolean isEmpty() {
-        return cards.isEmpty();
-    }
-
-    public void addCard(Card card) {
-        cards.push(card);
-    }
+    public boolean isEmpty() { return cards.isEmpty(); }
+    public int size() { return cards.size(); }
 }

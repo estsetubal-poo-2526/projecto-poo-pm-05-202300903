@@ -11,7 +11,7 @@ import java.io.IOException;
 public class ElementalDuelsApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(ElementalDuelsApp.class.getResource("views/main-menu.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(ElementalDuelsApp.class.getResource("/com/example/projectopoopm05202300903/views/main-menu.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         stage.setTitle("Elemental Duels - Menu");
         stage.setScene(scene);
