@@ -11,9 +11,5 @@ public class Hand {
     public void addCard(Card card) { cards.add(card); }
     public void removeCard(Card card) { cards.remove(card); }
 
-    public List<Card> getCards() { return cards; }
-
-    public List<Card> getPlayableCards(int mana) {
-        return cards.stream().filter(c -> c.getManaCost() <= mana).toList();
-    }
+    public List<Card> getCards() { return List.copyOf(cards); }
 }

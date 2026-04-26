@@ -2,14 +2,14 @@ package com.example.projectopoopm05202300903.models;
 
 import com.example.projectopoopm05202300903.models.card.Card;
 import com.example.projectopoopm05202300903.models.card.CardFactory;
-import com.example.projectopoopm05202300903.models.card.SpellCard;
 import com.example.projectopoopm05202300903.models.card.UnitCard;
-import com.example.projectopoopm05202300903.models.enums.SpellType;
+import com.example.projectopoopm05202300903.models.enums.PlayerType;
 import com.example.projectopoopm05202300903.models.exceptions.EmptyDeckException;
 import com.example.projectopoopm05202300903.models.exceptions.InsufficientManaException;
+import com.example.projectopoopm05202300903.models.interfaces.ITarget;
 import com.example.projectopoopm05202300903.models.player.AiPlayer;
 import com.example.projectopoopm05202300903.models.player.HumanPlayer;
-import com.example.projectopoopm05202300903.models.interfaces.ITarget;
+import com.example.projectopoopm05202300903.models.player.Player;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,20 +17,23 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class GameEngine {
-    private final HumanPlayer humanPlayer;
+
+    private final Player   humanPlayer;
     private final AiPlayer aiPlayer;
-    private final Board board;
+    private final Board    board;
+
     private boolean humanTurn  = true;
-    private int turnNumber = 1;
+    private int     turnNumber = 1;
     private boolean isGameOver = false;
-    private String winnerName = null;
+    private String  winnerName = null;
+
     private final Consumer<String> logCallback;
 
     public GameEngine(String playerName, Consumer<String> logCallback) {
         this.humanPlayer = new HumanPlayer(playerName);
-        this.aiPlayer = new AiPlayer("PC - Oponente");
-        this.board = new Board();
-        this.logCallback = logCallback;
+        this.aiPlayer    = new AiPlayer("AI - Oponente");
+        this.board       = new Board();
+        this.logCallback = logCallback != null ? logCallback : _ -> {};
     }
 
     public void startGame() throws EmptyDeckException {
@@ -46,34 +49,22 @@ public class GameEngine {
             aiPlayer.getHand().addCard(aiPlayer.getDeck().drawCard());
         }
 
-        humanPlayer.startTurnProcess();
-        log("Jogo iniciado! Turno 1 — " + humanPlayer.getName() + ".");
+        humanPlayer.startTurn();
+        log("Jogo iniciado! Turno 1 — " + humanPlayer.getName() + " começa.");
     }
 
     public void playCardFromHand(Card card) throws InsufficientManaException {
         humanPlayer.playCard(card);
-        if (card instanceof UnitCard unit) {
-            board.addPlayerUnit(unit);
-            log("Você jogou: " + card.getName() + ".");
-        } else if (card instanceof SpellCard spell) {
-            if (spell.getType() == SpellType.HEAL) {
-                spell.applyEffect(humanPlayer);
-                log("Você usou " + card.getName() + " e recuperou " + spell.getEffectValue() + " HP.");
-            } else {
-                spell.applyEffect(aiPlayer);
-                log("Você usou " + card.getName() + " — PC sofreu " + spell.getEffectValue() + " de dano!");
-            }
-            checkWinConditions();
-        }
+        log("Você " + card.play(humanPlayer, aiPlayer, board));
+        checkWinConditions();
     }
 
     public void processAttack(UnitCard attacker, ITarget target) {
         if (attacker.hasAttackedThisTurn() || isGameOver) return;
 
-        String targetName = (target instanceof UnitCard u) ? u.getName() : aiPlayer.getName();
         int dmg = attacker.getAttack();
         attacker.attackTarget(target);
-        log(attacker.getName() + " atacou " + targetName + " por " + dmg + " de dano!");
+        log(attacker.getName() + " atacou e causou " + dmg + " de dano!");
 
         board.removeDeadUnits();
         checkWinConditions();
@@ -81,74 +72,72 @@ public class GameEngine {
 
     public void endHumanTurn() {
         if (!humanTurn || isGameOver) return;
-        log("-- Fim do seu turno --");
+        log("Fim do teu turno.");
 
-        board.getPlayerUnits().forEach(UnitCard::resetAttackStatus);
+        board.getUnits(PlayerType.PLAYER).forEach(UnitCard::resetAttackStatus);
         humanTurn = false;
         turnNumber++;
 
         try {
             processAiTurn();
-        } catch (EmptyDeckException _) {
-            log("O baralho do PC está vazio! PC perde!");
+        } catch (EmptyDeckException _) {log("O baralho do oponente esgotou! Vitória tua!");
             isGameOver = true;
             winnerName = humanPlayer.getName();
         }
 
         if (!isGameOver) {
             try {
-                humanPlayer.startTurnProcess();
+                humanPlayer.startTurn();
             } catch (EmptyDeckException _) {
-                log("O seu baralho está vazio! Você perde!");
+                log("O teu baralho esgotou! Derrota!");
                 isGameOver = true;
                 winnerName = aiPlayer.getName();
                 return;
             }
             humanTurn = true;
-            log("-- Turno " + turnNumber + " — " + humanPlayer.getName() + " --");
+            log("Turno " + turnNumber + " — " + humanPlayer.getName() + ".");
         }
     }
 
     private void processAiTurn() throws EmptyDeckException {
-        aiPlayer.startTurnProcess();
-        log("[PC] Turno do oponente...");
-        board.getPcUnits().forEach(UnitCard::resetAttackStatus);
+        aiPlayer.startTurn();
+        board.getUnits(PlayerType.AI).forEach(UnitCard::resetAttackStatus);
+        log("[Oponente] A jogar...");
 
+        playAiCards();
+        if (!isGameOver) performAiAttacks();
+    }
+
+    private void playAiCards() {
         List<Card> hand = new ArrayList<>(aiPlayer.getHand().getCards());
         hand.sort(Comparator.comparingInt(Card::getManaCost));
+
         for (Card card : hand) {
             if (card.getManaCost() > aiPlayer.getCurrentMana()) continue;
             try {
                 aiPlayer.playCard(card);
-                if (card instanceof UnitCard unit) {
-                    board.addPcUnit(unit);
-                    log("[PC] jogou: " + card.getName() + ".");
-                } else if (card instanceof SpellCard spell) {
-                    if (spell.getType() == SpellType.DAMAGE) {
-                        spell.applyEffect(humanPlayer);
-                        log("[PC] usou " + card.getName() + " em você — " + spell.getEffectValue() + " de dano!");
-                    } else {
-                        spell.applyEffect(aiPlayer);
-                        log("[PC] usou " + card.getName() + " e recuperou " + spell.getEffectValue() + " HP.");
-                    }
-                    checkWinConditions();
-                    if (isGameOver) return;
-                }
-            } catch (InsufficientManaException _) {}
+                log("[Oponente] " + card.play(aiPlayer, humanPlayer, board));
+                checkWinConditions();
+                if (isGameOver) return;
+            } catch (InsufficientManaException _) { /* skip */ }
         }
+    }
 
-        List<UnitCard> attackers = new ArrayList<>(board.getPcUnits());
-        for (UnitCard attacker : attackers) {
+    private void performAiAttacks() {
+        for (UnitCard attacker : new ArrayList<>(board.getUnits(PlayerType.AI))) {
             if (attacker.isDead() || attacker.hasAttackedThisTurn()) continue;
-            List<UnitCard> targets = board.getPlayerUnits();
+
+            List<UnitCard> targets = board.getUnits(PlayerType.PLAYER);
             if (!targets.isEmpty()) {
-                UnitCard target = targets.get(0);
+                UnitCard target = targets.getFirst();
                 attacker.attackTarget(target);
-                log("[PC] " + attacker.getName() + " atacou " + target.getName() + ".");
+                log("[Oponente] " + attacker.getName() + " atacou " + target.getName() + " e causou " + attacker.getAttack() + " de dano!");
             } else {
                 attacker.attackTarget(humanPlayer);
-                log("[PC] " + attacker.getName() + " atacou você por " + attacker.getAttack() + " de dano!");
+                log("[Oponente] " + attacker.getName() + " atacou-te diretamente por "
+                        + attacker.getAttack() + " de dano!");
             }
+
             board.removeDeadUnits();
             checkWinConditions();
             if (isGameOver) return;
@@ -159,22 +148,22 @@ public class GameEngine {
         if (humanPlayer.isDead()) {
             isGameOver = true;
             winnerName = aiPlayer.getName();
-            log("GAME OVER! O PC venceu!");
+            log("DERROTA! " + aiPlayer.getName() + " venceu o duelo.");
         } else if (aiPlayer.isDead()) {
             isGameOver = true;
             winnerName = humanPlayer.getName();
-            log("VITÓRIA! Você venceu!");
+            log("VITÓRIA! " + humanPlayer.getName() + " venceu o duelo!");
         }
     }
 
     private void log(String msg) {
-        if (logCallback != null) logCallback.accept(msg);
+        logCallback.accept(msg);
     }
 
-    public HumanPlayer getHumanPlayer() { return humanPlayer; }
-    public AiPlayer    getAiPlayer()    { return aiPlayer; }
-    public Board       getBoard()       { return board; }
-    public boolean     isHumanTurn()   { return !humanTurn; }
-    public boolean     isGameOver()    { return isGameOver; }
-    public String      getWinnerName() { return winnerName; }
+    public Player  getHumanPlayer() { return humanPlayer; }
+    public Player  getAiPlayer()    { return aiPlayer; }
+    public Board   getBoard()       { return board; }
+    public boolean isHumanTurn()    { return humanTurn; }
+    public boolean isGameOver()     { return isGameOver; }
+    public String  getWinnerName()  { return winnerName; }
 }

@@ -1,22 +1,33 @@
 package com.example.projectopoopm05202300903.models;
 
 import com.example.projectopoopm05202300903.models.card.UnitCard;
+import com.example.projectopoopm05202300903.models.card.UnitCardGroup;
+import com.example.projectopoopm05202300903.models.enums.PlayerType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Board {
-    private final List<UnitCard> playerUnits = new ArrayList<>();
-    private final List<UnitCard> pcUnits     = new ArrayList<>();
+    private final UnitCardGroup units = new UnitCardGroup();
 
-    public void addPlayerUnit(UnitCard card) { playerUnits.add(card); }
-    public void addPcUnit(UnitCard card)     { pcUnits.add(card); }
-
-    public void removeDeadUnits() {
-        playerUnits.removeIf(UnitCard::isDead);
-        pcUnits.removeIf(UnitCard::isDead);
+    public void addUnit(PlayerType type, UnitCard card) {
+        units.addUnit(type, card);
     }
 
-    public List<UnitCard> getPlayerUnits() { return playerUnits; }
-    public List<UnitCard> getPcUnits()     { return pcUnits; }
+    public void removeDeadUnits() {
+        for (PlayerType type : PlayerType.values()) {
+            units.getUnits(type).removeIf(UnitCard::isDead);
+        }
+    }
+
+    public List<UnitCard> getUnits(PlayerType type) {
+        return units.getUnits(type);
+    }
+
+    public List<UnitCard> getEnemiesOf(PlayerType type) {
+        return units.getEnemiesOf(type);
+    }
+
+    public List<UnitCard> getAllUnits() {
+        return units.getAllUnits();
+    }
 }

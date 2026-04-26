@@ -13,8 +13,6 @@ import java.io.IOException;
 public class ElementalDuelsController {
     @FXML
     protected void onCreateNewGameClick(ActionEvent event) {
-        System.out.println("Creating New Game...");
-
         try {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             FXMLLoader fxmlLoader = new FXMLLoader(ElementalDuelsController.class.getResource("/com/example/projectopoopm05202300903/views/game-arena.fxml"));

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CardFactory {
+    private CardFactory() {}
 
     public static List<Card> createDeck() {
         List<Card> cards = new ArrayList<>();
@@ -34,6 +35,6 @@ public class CardFactory {
         cards.add(new SpellCard("Explosão Elemental",   4, "Causa 5 de dano",     5, SpellType.DAMAGE));
         cards.add(new SpellCard("Tempestade de Raios",  5, "Causa 7 de dano",     7, SpellType.DAMAGE));
 
-        return cards;
+        return List.copyOf(cards);
     }
 }

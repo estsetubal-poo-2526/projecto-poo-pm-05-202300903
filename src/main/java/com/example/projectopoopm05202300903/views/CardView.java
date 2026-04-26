@@ -1,9 +1,6 @@
 package com.example.projectopoopm05202300903.views;
 
 import com.example.projectopoopm05202300903.models.card.Card;
-import com.example.projectopoopm05202300903.models.card.SpellCard;
-import com.example.projectopoopm05202300903.models.card.UnitCard;
-import com.example.projectopoopm05202300903.models.enums.SpellType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -18,11 +15,10 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
 public class CardView extends StackPane {
-
     private static final double W = 108;
     private static final double H = 155;
 
-    private final Card card;
+    private final Card    card;
     private final boolean onBoard;
     private boolean selected = false;
 
@@ -50,9 +46,11 @@ public class CardView extends StackPane {
     }
 
     private void buildFaceUp() {
-        setStyle(baseStyle());
+        // stats[0] = {typeLabel, borderColor, artBgColor}  (display metadata)
+        // stats[1+] = {text, fg, bg, fontSize}             (stat labels)
+        String[][] stats = card.getCardAppearance(onBoard);
 
-        boolean isUnit = card instanceof UnitCard;
+        setStyle(baseStyle(stats[0][1]));
 
         VBox root = new VBox(4);
         root.setPadding(new Insets(6));
@@ -72,7 +70,7 @@ public class CardView extends StackPane {
 
         topRow.getChildren().addAll(manaBadge, nameLabel);
 
-        StackPane art = artArea(isUnit);
+        StackPane art = artArea(stats[0][0], stats[0][2]);
 
         Label desc = new Label(card.getDescription());
         desc.setStyle("-fx-font-size: 8px; -fx-text-fill: #adb5bd;");
@@ -80,12 +78,13 @@ public class CardView extends StackPane {
         desc.setMaxWidth(W - 12);
         desc.setAlignment(Pos.CENTER);
 
-        HBox stats = statsRow(isUnit);
+        HBox statRow = statsRow(stats);
 
-        root.getChildren().addAll(topRow, art, desc, stats);
+        root.getChildren().addAll(topRow, art, desc, statRow);
         getChildren().add(root);
 
-        Tooltip.install(this, new Tooltip(card.getName() + "\nMana: " + card.getManaCost() + "\n" + card.getDescription()));
+        Tooltip.install(this, new Tooltip(
+                card.getName() + "\nMana: " + card.getManaCost() + "\n" + card.getDescription()));
     }
 
     private StackPane manaBadge(int mana) {
@@ -101,55 +100,37 @@ public class CardView extends StackPane {
         return badge;
     }
 
-    private StackPane artArea(boolean isUnit) {
+    private StackPane artArea(String typeLabel, String artBgColor) {
         Rectangle bg = new Rectangle(W - 12, 56);
         bg.setArcWidth(6);
         bg.setArcHeight(6);
-        bg.setFill(isUnit ? Color.web("#c0392b", 0.35) : Color.web("#8e44ad", 0.35));
+        bg.setFill(Color.web(artBgColor, 0.35));
 
-        Label typeLabel = new Label(isUnit ? "UNIDADE" : "MAGIA");
-        typeLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: white;");
+        Label label = new Label(typeLabel);
+        label.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: white;");
 
-        StackPane art = new StackPane(bg, typeLabel);
+        StackPane art = new StackPane(bg, label);
         art.setPrefHeight(58);
         art.setMinHeight(58);
         return art;
     }
 
-    private HBox statsRow(boolean isUnit) {
+    /** Renders stat rows from index 1 onwards (index 0 is display metadata). */
+    private HBox statsRow(String[][] stats) {
         HBox row = new HBox(6);
         row.setAlignment(Pos.CENTER);
         row.setPadding(new Insets(2, 0, 0, 0));
-
-        if (isUnit) {
-            UnitCard unit = (UnitCard) card;
-
-            Label atk = stat("ATK " + unit.getAttack(), "#ffd700", "#e74c3c44");
-            String hpText = onBoard
-                    ? unit.getCurrentHealth() + "/" + unit.getMaxHealth()
-                    : String.valueOf(unit.getMaxHealth());
-            Label hp = stat("HP " + hpText, "#ff6b6b", "#c0392b44");
-            row.getChildren().addAll(atk, hp);
-
-            if (onBoard && unit.hasAttackedThisTurn()) {
-                Label used = new Label("(usado)");
-                used.setStyle("-fx-font-size: 7px; -fx-text-fill: #868e96;");
-                row.getChildren().add(used);
-            }
-        } else {
-            SpellCard spell = (SpellCard) card;
-            boolean isDmg = spell.getType() == SpellType.DAMAGE;
-            String prefix = isDmg ? "DMG " : "CURA ";
-            String color  = isDmg ? "#ff6b6b" : "#69db7c";
-            row.getChildren().add(stat(prefix + spell.getEffectValue(), color, "#00000055"));
+        for (int i = 1; i < stats.length; i++) {
+            String[] s = stats[i];
+            row.getChildren().add(stat(s[0], s[1], s[2], s[3]));
         }
         return row;
     }
 
-    private Label stat(String text, String fg, String bg) {
+    private Label stat(String text, String fg, String bg, String fontSize) {
         Label l = new Label(text);
-        l.setStyle("-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: " + fg +
-                   "; -fx-background-color: " + bg + "; -fx-background-radius: 3; -fx-padding: 1 3;");
+        l.setStyle("-fx-font-size: " + fontSize + "; -fx-font-weight: bold; -fx-text-fill: " + fg
+                + "; -fx-background-color: " + bg + "; -fx-background-radius: 3; -fx-padding: 1 3;");
         return l;
     }
 
@@ -159,29 +140,29 @@ public class CardView extends StackPane {
             setStyle(style("#1a1d23", "#ffd700", true));
             setTranslateY(-12);
         } else {
-            setStyle(baseStyle());
+            setStyle(baseStyle(card.getCardAppearance(onBoard)[0][1]));
             setTranslateY(0);
         }
     }
 
     private void applyHover(boolean on) {
         setTranslateY(on ? -6 : 0);
-        setStyle(on ? style("#1a1d23", "#00d2ff", false) : baseStyle());
+        setStyle(on
+                ? style("#1a1d23", "#00d2ff", false)
+                : baseStyle(card.getCardAppearance(onBoard)[0][1]));
     }
 
-    private String baseStyle() {
-        boolean isUnit = card instanceof UnitCard;
-        String border  = isUnit ? "#e74c3c" : "#8e44ad";
-        return style("#1a1d23", border, false);
+    private String baseStyle(String borderColor) {
+        return style("#1a1d23", borderColor, false);
     }
 
     private String style(String bg, String border, boolean glow) {
-        String base = "-fx-background-color: " + bg + "; -fx-background-radius: 8; " +
-                      "-fx-border-color: " + border + "; -fx-border-radius: 8; -fx-border-width: 2;";
+        String base = "-fx-background-color: " + bg + "; -fx-background-radius: 8; "
+                + "-fx-border-color: " + border + "; -fx-border-radius: 8; -fx-border-width: 2;";
         if (glow) base += " -fx-effect: dropshadow(gaussian, " + border + ", 14, 0.7, 0, 0);";
         return base;
     }
 
-    public Card getCard()   { return card; }
-    public boolean isSelected() { return selected; }
+    public Card    getCard()     { return card; }
+    public boolean isSelected()  { return selected; }
 }

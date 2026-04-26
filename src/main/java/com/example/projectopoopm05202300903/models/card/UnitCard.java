@@ -1,6 +1,8 @@
 package com.example.projectopoopm05202300903.models.card;
 
+import com.example.projectopoopm05202300903.models.Board;
 import com.example.projectopoopm05202300903.models.interfaces.ITarget;
+import com.example.projectopoopm05202300903.models.player.Player;
 
 public class UnitCard extends Card implements ITarget {
     private final int attack;
@@ -13,16 +15,38 @@ public class UnitCard extends Card implements ITarget {
         this.attack = attack;
         this.maxHealth = health;
         this.currentHealth = health;
-        this.hasAttackedThisTurn = false;
     }
 
     public void attackTarget(ITarget target) {
         if (hasAttackedThisTurn) return;
-        target.receiveDamage(attack);
-        if (target instanceof UnitCard enemy) {
-            receiveDamage(enemy.getAttack());
-        }
+        target.takeAttackFrom(attack, this);
         hasAttackedThisTurn = true;
+    }
+
+    @Override
+    public void takeAttackFrom(int incomingDamage, ITarget attacker) {
+        receiveDamage(incomingDamage);
+        attacker.receiveDamage(attack);
+    }
+
+    @Override
+    public String play(Player caster, Player opponent, Board board) {
+        board.addUnit(caster.getPlayerType(), this);
+        return "invocou " + name + " no campo de batalha!";
+    }
+
+    @Override
+    public String[][] getCardAppearance(boolean onBoard) {
+        String hpText = onBoard ? currentHealth + "/" + maxHealth : String.valueOf(maxHealth);
+        String[][] base = {
+            {"UNIDADE",        "#e74c3c",    "#c0392b"},
+            {"ATK " + attack,  "#ffd700",    "#e74c3c44",   "9px"},
+            {"HP "  + hpText,  "#ff6b6b",    "#c0392b44",   "9px"}
+        };
+        if (!onBoard || !hasAttackedThisTurn) return base;
+        return new String[][] { base[0], base[1], base[2],
+            {"(usado)", "#868e96", "transparent", "7px"}
+        };
     }
 
     @Override
@@ -30,27 +54,8 @@ public class UnitCard extends Card implements ITarget {
         currentHealth = Math.max(0, currentHealth - amount);
     }
 
-    @Override
-    public void receiveHealing(int amount) {
-        currentHealth = Math.min(maxHealth, currentHealth + amount);
-    }
-
-    @Override
-    public boolean isDead() {
-        return currentHealth <= 0;
-    }
-
-    @Override
-    public void applyEffect(ITarget target) {
-        attackTarget(target);
-    }
-
-    public void resetAttackStatus() {
-        hasAttackedThisTurn = false;
-    }
-
+    public boolean isDead() { return currentHealth <= 0; }
     public int getAttack() { return attack; }
-    public int getMaxHealth() { return maxHealth; }
-    public int getCurrentHealth() { return currentHealth; }
+    public void resetAttackStatus() { hasAttackedThisTurn = false; }
     public boolean hasAttackedThisTurn() { return hasAttackedThisTurn; }
 }

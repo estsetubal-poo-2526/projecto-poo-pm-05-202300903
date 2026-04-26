@@ -1,6 +1,7 @@
 package com.example.projectopoopm05202300903.models.card;
 
-import com.example.projectopoopm05202300903.models.interfaces.ITarget;
+import com.example.projectopoopm05202300903.models.Board;
+import com.example.projectopoopm05202300903.models.player.Player;
 
 public abstract class Card {
     protected final String name;
@@ -13,9 +14,11 @@ public abstract class Card {
         this.description = description;
     }
 
-    public abstract void applyEffect(ITarget target);
+    public abstract String play(Player caster, Player opponent, Board board);
 
-    public String getName() { return name; }
-    public int getManaCost() { return manaCost; }
-    public String getDescription() { return description; }
+    public abstract String[][] getCardAppearance(boolean onBoard);
+
+    public String getName() { return this.name; }
+    public int getManaCost() { return this.manaCost; }
+    public String getDescription() { return this.description; }
 }

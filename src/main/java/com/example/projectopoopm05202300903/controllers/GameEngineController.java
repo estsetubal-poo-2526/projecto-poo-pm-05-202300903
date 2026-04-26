@@ -2,6 +2,7 @@ package com.example.projectopoopm05202300903.controllers;
 
 import com.example.projectopoopm05202300903.models.card.Card;
 import com.example.projectopoopm05202300903.models.card.UnitCard;
+import com.example.projectopoopm05202300903.models.enums.PlayerType;
 import com.example.projectopoopm05202300903.models.exceptions.EmptyDeckException;
 import com.example.projectopoopm05202300903.models.exceptions.InsufficientManaException;
 import com.example.projectopoopm05202300903.models.GameEngine;
@@ -23,7 +24,6 @@ public class GameEngineController {
     @FXML private Label aiManaLabel;
     @FXML private HBox  aiHandBox;
     @FXML private Label aiDeckCountLabel;
-    @FXML private Label aiTimerLabel;
 
     @FXML private HBox aiBoardBox;
     @FXML private HBox playerBoardBox;
@@ -33,7 +33,6 @@ public class GameEngineController {
     @FXML private Label playerManaLabel;
     @FXML private HBox  playerHandBox;
     @FXML private Label playerDeckCountLabel;
-    @FXML private Label playerTimerLabel;
 
     @FXML private TextArea combatLogArea;
     @FXML private Button   endTurnButton;
@@ -47,30 +46,30 @@ public class GameEngineController {
         engine = new GameEngine("Jogador", this::logMessage);
         try {
             engine.startGame();
-        } catch (EmptyDeckException e) {
-            logMessage("Erro ao iniciar o jogo: " + e.getMessage());
+        } catch (EmptyDeckException ex) {
+            logMessage("Erro ao iniciar o jogo: " + ex.getMessage());
         }
         updateUI();
     }
 
     private void updateUI() {
-        var hp = engine.getHumanPlayer();
-        var ai = engine.getAiPlayer();
+        var humanPlayer = engine.getHumanPlayer();
+        var aiPlayer    = engine.getAiPlayer();
 
-        playerNameLabel.setText(hp.getName());
-        playerHpLabel.setText("HP: " + hp.getCurrentHp() + "/" + hp.getMaxHp());
-        playerManaLabel.setText("Mana: " + hp.getCurrentMana() + "/" + hp.getMaxMana());
-        playerDeckCountLabel.setText("Deck: " + hp.getDeck().size());
+        playerNameLabel.setText(humanPlayer.getName());
+        playerHpLabel.setText("HP: " + humanPlayer.getCurrentHp() + "/" + humanPlayer.getMaxHp());
+        playerManaLabel.setText("Mana: " + humanPlayer.getCurrentMana() + "/" + humanPlayer.getMaxMana());
+        playerDeckCountLabel.setText("Deck: " + humanPlayer.getDeck().size());
 
-        aiNameLabel.setText(ai.getName());
-        aiHpLabel.setText("HP: " + ai.getCurrentHp() + "/" + ai.getMaxHp());
-        aiManaLabel.setText("Mana: " + ai.getCurrentMana() + "/" + ai.getMaxMana());
-        aiDeckCountLabel.setText("Deck: " + ai.getDeck().size());
+        aiNameLabel.setText(aiPlayer.getName());
+        aiHpLabel.setText("HP: " + aiPlayer.getCurrentHp() + "/" + aiPlayer.getMaxHp());
+        aiManaLabel.setText("Mana: " + aiPlayer.getCurrentMana() + "/" + aiPlayer.getMaxMana());
+        aiDeckCountLabel.setText("Deck: " + aiPlayer.getDeck().size());
 
         renderHand();
         renderBoards();
 
-        endTurnButton.setDisable(engine.isGameOver() || engine.isHumanTurn());
+        endTurnButton.setDisable(engine.isGameOver() || !engine.isHumanTurn());
 
         if (engine.isGameOver()) showGameOverAlert();
     }
@@ -78,68 +77,68 @@ public class GameEngineController {
     private void renderHand() {
         playerHandBox.getChildren().clear();
         for (Card card : engine.getHumanPlayer().getHand().getCards()) {
-            CardView cv = new CardView(card, false, false);
-            boolean affordable = card.getManaCost() <= engine.getHumanPlayer().getCurrentMana();
-            if (!affordable) cv.setOpacity(0.45);
-            cv.setOnMouseClicked(e -> onHandCardClicked(card));
-            playerHandBox.getChildren().add(cv);
+            CardView cardView = new CardView(card, false, false);
+            boolean canAfford = card.getManaCost() <= engine.getHumanPlayer().getCurrentMana();
+            if (!canAfford) cardView.setOpacity(0.45);
+            cardView.setOnMouseClicked(event -> onHandCardClicked(card));
+            playerHandBox.getChildren().add(cardView);
         }
 
         aiHandBox.getChildren().clear();
-        for (Card ignored : engine.getAiPlayer().getHand().getCards()) {
-            CardView cv = new CardView(ignored, true, false);
-            cv.setCursor(javafx.scene.Cursor.DEFAULT);
-            aiHandBox.getChildren().add(cv);
+        for (Card aiCard : engine.getAiPlayer().getHand().getCards()) {
+            CardView cardView = new CardView(aiCard, true, false);
+            cardView.setCursor(javafx.scene.Cursor.DEFAULT);
+            aiHandBox.getChildren().add(cardView);
         }
     }
 
     private void renderBoards() {
         playerBoardBox.getChildren().clear();
-        for (UnitCard unit : engine.getBoard().getPlayerUnits()) {
-            CardView cv = new CardView(unit, false, true);
-            if (unit.hasAttackedThisTurn()) cv.setOpacity(0.6);
-            cv.setOnMouseClicked(e -> onPlayerBoardUnitClicked(cv, unit));
-            playerBoardBox.getChildren().add(cv);
+        for (UnitCard unit : engine.getBoard().getUnits(PlayerType.PLAYER)) {
+            CardView cardView = new CardView(unit, false, true);
+            if (unit.hasAttackedThisTurn()) cardView.setOpacity(0.6);
+            cardView.setOnMouseClicked(event -> onPlayerBoardUnitClicked(cardView, unit));
+            playerBoardBox.getChildren().add(cardView);
         }
 
         aiBoardBox.getChildren().clear();
-        for (UnitCard unit : engine.getBoard().getPcUnits()) {
-            CardView cv = new CardView(unit, false, true);
-            cv.setOnMouseClicked(e -> onEnemyUnitClicked(unit));
-            aiBoardBox.getChildren().add(cv);
+        for (UnitCard unit : engine.getBoard().getUnits(PlayerType.AI)) {
+            CardView cardView = new CardView(unit, false, true);
+            cardView.setOnMouseClicked(event -> onEnemyUnitClicked(unit));
+            aiBoardBox.getChildren().add(cardView);
         }
 
-        aiHpLabel.setOnMouseClicked(e -> onAttackAiPlayerDirect());
+        aiHpLabel.setOnMouseClicked(event -> onAttackAiPlayerDirect());
         aiHpLabel.setCursor(selectedBoardUnit != null
                 ? javafx.scene.Cursor.HAND : javafx.scene.Cursor.DEFAULT);
     }
 
     private void onHandCardClicked(Card card) {
-        if (engine.isHumanTurn() || engine.isGameOver()) return;
+        if (!engine.isHumanTurn() || engine.isGameOver()) return;
         clearBoardSelection();
         try {
             engine.playCardFromHand(card);
             updateUI();
-        } catch (InsufficientManaException e) {
+        } catch (InsufficientManaException ex) {
             logMessage("Mana insuficiente!");
         }
     }
 
-    private void onPlayerBoardUnitClicked(CardView cv, UnitCard unit) {
-        if (engine.isHumanTurn() || engine.isGameOver()) return;
+    private void onPlayerBoardUnitClicked(CardView cardView, UnitCard unit) {
+        if (!engine.isHumanTurn() || engine.isGameOver()) return;
         if (unit.hasAttackedThisTurn()) {
             logMessage(unit.getName() + " já atacou este turno.");
             return;
         }
         if (selectedBoardView != null) selectedBoardView.setSelected(false);
 
-        if (selectedBoardView == cv) {
+        if (selectedBoardView == cardView) {
             selectedBoardUnit = null;
             selectedBoardView = null;
         } else {
             selectedBoardUnit = unit;
-            selectedBoardView = cv;
-            cv.setSelected(true);
+            selectedBoardView = cardView;
+            cardView.setSelected(true);
             logMessage("Seleccionado: " + unit.getName() + ". Clique num inimigo para atacar.");
         }
         renderBoards();
@@ -154,7 +153,7 @@ public class GameEngineController {
 
     private void onAttackAiPlayerDirect() {
         if (selectedBoardUnit == null || engine.isGameOver()) return;
-        if (!engine.getBoard().getPcUnits().isEmpty()) {
+        if (!engine.getBoard().getUnits(PlayerType.AI).isEmpty()) {
             logMessage("Não pode atacar o PC directamente enquanto tiver unidades no campo!");
             return;
         }
@@ -177,25 +176,25 @@ public class GameEngineController {
         selectedHandView  = null;
     }
 
-    private void logMessage(String msg) {
+    private void logMessage(String message) {
         Platform.runLater(() -> {
-            combatLogArea.appendText(msg + "\n");
+            combatLogArea.appendText(message + "\n");
             combatLogArea.setScrollTop(Double.MAX_VALUE);
         });
     }
 
     private void showGameOverAlert() {
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Fim de Jogo");
-            alert.setHeaderText(null);
-            String winner = engine.getWinnerName();
-            if ("Jogador".equals(winner)) {
-                alert.setContentText("VITÓRIA! Parabéns, " + winner + "!");
+            Alert gameOverAlert = new Alert(Alert.AlertType.INFORMATION);
+            gameOverAlert.setTitle("Fim de Jogo");
+            gameOverAlert.setHeaderText(null);
+            String winnerName = engine.getWinnerName();
+            if ("Jogador".equals(winnerName)) {
+                gameOverAlert.setContentText("VITÓRIA! Parabéns, " + winnerName + "!");
             } else {
-                alert.setContentText("DERROTA! O PC venceu desta vez...");
+                gameOverAlert.setContentText("DERROTA! O PC venceu desta vez...");
             }
-            alert.showAndWait();
+            gameOverAlert.showAndWait();
         });
     }
 }
