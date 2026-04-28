@@ -1,32 +1,33 @@
 package com.example.projectopoopm05202300903.models;
 
-import com.example.projectopoopm05202300903.models.Card.UnitCard;
-import com.example.projectopoopm05202300903.models.Player.HumanPlayer;
-import com.example.projectopoopm05202300903.models.Player.Player;
+import com.example.projectopoopm05202300903.models.card.UnitCard;
+import com.example.projectopoopm05202300903.models.card.UnitCardGroup;
+import com.example.projectopoopm05202300903.models.enums.PlayerType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Board {
-    private List<UnitCard> playerUnits;
-    private List<UnitCard> pcUnits;
+    private final UnitCardGroup units = new UnitCardGroup();
 
-    public Board() {
-        this.playerUnits = new ArrayList<>();
-        this.pcUnits = new ArrayList<>();
-    }
-
-    public void addUnit(Player player, UnitCard unit) {
-        playerUnits.add(unit);
+    public void addUnit(PlayerType type, UnitCard card) {
+        units.addUnit(type, card);
     }
 
     public void removeDeadUnits() {
-        playerUnits.removeIf(unitCard -> !unitCard.isAlive());
+        for (PlayerType type : PlayerType.values()) {
+            units.getUnits(type).removeIf(UnitCard::isDead);
+        }
     }
 
-    public List<UnitCard> getPlayerUnits() {return List.copyOf(playerUnits); }
+    public List<UnitCard> getUnits(PlayerType type) {
+        return units.getUnits(type);
+    }
 
-    public List<UnitCard> getPCUnits() {
-        return List.copyOf(pcUnits);
+    public List<UnitCard> getEnemiesOf(PlayerType type) {
+        return units.getEnemiesOf(type);
+    }
+
+    public List<UnitCard> getAllUnits() {
+        return units.getAllUnits();
     }
 }

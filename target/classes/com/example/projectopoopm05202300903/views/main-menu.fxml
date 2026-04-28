@@ -12,15 +12,14 @@
 
     <center>
         <VBox alignment="CENTER" spacing="40.0" BorderPane.alignment="CENTER">
-            <children>
-                <Label styleClass="title-label" text="ELEMENTAL DUELS" />
+            <Label styleClass="title-label" text="ELEMENTAL DUELS"/>
 
-                <Button mnemonicParsing="false" onAction="#onCreateNewGameClick" styleClass="menu-button" text="CRIAR NOVO JOGO">
-                </Button>
+            <Button mnemonicParsing="false" onAction="#onCreateNewGameClick" styleClass="menu-button"
+                    text="CRIAR NOVO JOGO">
+            </Button>
 
-                <Button mnemonicParsing="false" onAction="#onExitGameClick"
-                        styleClass="menu-button" text="SAIR" />
-            </children>
+            <Button mnemonicParsing="false" onAction="#onExitGameClick"
+                    styleClass="menu-button" text="SAIR"/>
         </VBox>
     </center>
 
