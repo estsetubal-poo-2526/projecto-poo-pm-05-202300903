@@ -1,73 +1,115 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.text.Font?>
-<BorderPane prefHeight="720.0" prefWidth="1080.0" stylesheets="@assets/style.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.projectopoopm05202300903.controllers.GameEngineController">
+<?import javafx.scene.control.Separator?>
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.example.projectopoopm05202300903.controllers.GameEngineController">
 
-    <top>
-        <HBox alignment="CENTER_LEFT" prefHeight="120.0" spacing="20.0" style="-fx-background-color: #2A2E33; -fx-padding: 10;">
-            <VBox alignment="CENTER" prefWidth="180.0" spacing="5.0">
-                <Label fx:id="aiNameLabel" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="PC - Oponente" textFill="WHITE" />
-                <Label fx:id="aiHpLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="HP: ?/20" textFill="#ff6b6b" />
-                <Label fx:id="aiManaLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Mana: ?/10" textFill="#4dabf7" />
+    <BorderPane>
+        <top>
+            <HBox alignment="CENTER_LEFT" prefHeight="120.0" spacing="20.0" style="-fx-background-color: #2A2E33; -fx-padding: 10;">
+                <VBox alignment="CENTER" prefWidth="180.0" spacing="5.0">
+                    <Label fx:id="aiNameLabel" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="PC - Oponente" textFill="WHITE" />
+                    <Label fx:id="aiHpLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="HP: ?/20" textFill="#ff6b6b" />
+                    <Label fx:id="aiManaLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Mana: ?/10" textFill="#4dabf7" />
+                </VBox>
+
+                <Region HBox.hgrow="ALWAYS" /> <HBox fx:id="aiHandBox" alignment="CENTER" prefHeight="100.0" prefWidth="400.0" spacing="-20.0" style="-fx-border-color: #5c5f66; -fx-border-style: dashed;" />
+
+                <Region HBox.hgrow="ALWAYS" /> <VBox alignment="CENTER" prefWidth="120.0" spacing="5.0">
+                <Label fx:id="aiDeckCountLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Deck: ?/10" textFill="WHITE" />
+                <Label fx:id="aiTimerLabel" style="-fx-font-size: 14px;" text="Time: 42s" textFill="#adb5bd" />
             </VBox>
+            </HBox>
+        </top>
 
-            <Region HBox.hgrow="ALWAYS" /> <HBox fx:id="aiHandBox" alignment="CENTER" prefHeight="100.0" prefWidth="400.0" spacing="-20.0" style="-fx-border-color: #5c5f66; -fx-border-style: dashed;" />
+        <center>
+            <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: #1E2124; -fx-padding: 20;">
 
-            <Region HBox.hgrow="ALWAYS" /> <VBox alignment="CENTER" prefWidth="120.0" spacing="5.0">
-            <Label fx:id="aiDeckCountLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Deck: ?/10" textFill="WHITE" />
-            <Label fx:id="aiTimerLabel" style="-fx-font-size: 14px;" text="Time: 42s" textFill="#adb5bd" />
-        </VBox>
-        </HBox>
-    </top>
+                <HBox fx:id="aiBoardBox" alignment="CENTER" prefHeight="200.0" spacing="15.0" style="-fx-border-color: #495057;" />
 
-    <center>
-        <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: #1E2124; -fx-padding: 20;">
+                <Separator prefWidth="200.0" />
 
-            <HBox fx:id="aiBoardBox" alignment="CENTER" prefHeight="200.0" spacing="15.0" style="-fx-border-color: #495057;" />
+                <HBox fx:id="playerBoardBox" alignment="CENTER" prefHeight="200.0" spacing="15.0" style="-fx-border-color: #495057;" />
 
-            <Separator prefWidth="200.0" />
-
-            <HBox fx:id="playerBoardBox" alignment="CENTER" prefHeight="200.0" spacing="15.0" style="-fx-border-color: #495057;" />
-
-        </VBox>
-    </center>
-
-    <bottom>
-        <HBox alignment="CENTER_LEFT" prefHeight="150.0" spacing="20.0" style="-fx-background-color: #2A2E33; -fx-padding: 10;">
-            <VBox alignment="CENTER" prefWidth="180.0" spacing="5.0">
-                <Label fx:id="playerNameLabel" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="EU_Nome" textFill="WHITE" />
-                <Label fx:id="playerHpLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="HP: ?/20" textFill="#ff6b6b" />
-                <Label fx:id="playerManaLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Mana: ?/10" textFill="#4dabf7" />
             </VBox>
+        </center>
 
-            <Region HBox.hgrow="ALWAYS" /> <HBox fx:id="playerHandBox" alignment="CENTER" prefHeight="130.0" prefWidth="500.0" spacing="10.0" style="-fx-border-color: #868e96; -fx-border-style: dashed;" />
+        <bottom>
+            <HBox alignment="CENTER_LEFT" prefHeight="150.0" spacing="20.0" style="-fx-background-color: #2A2E33; -fx-padding: 10;">
+                <VBox alignment="CENTER" prefWidth="180.0" spacing="5.0">
+                    <Label fx:id="playerNameLabel" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="EU_Nome" textFill="WHITE" />
+                    <Label fx:id="playerHpLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="HP: ?/20" textFill="#ff6b6b" />
+                    <Label fx:id="playerManaLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Mana: ?/10" textFill="#4dabf7" />
+                </VBox>
 
-            <Region HBox.hgrow="ALWAYS" /> <VBox alignment="CENTER" prefWidth="120.0" spacing="5.0">
-            <Label fx:id="playerDeckCountLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Deck: ?/10" textFill="WHITE" />
-            <Label fx:id="playerTimerLabel" style="-fx-font-size: 14px;" text="Time: 42s" textFill="#adb5bd" />
+                <Region HBox.hgrow="ALWAYS" /> <HBox fx:id="playerHandBox" alignment="CENTER" prefHeight="130.0" prefWidth="500.0" spacing="10.0" style="-fx-border-color: #868e96; -fx-border-style: dashed;" />
+
+                <Region HBox.hgrow="ALWAYS" /> <VBox alignment="CENTER" prefWidth="120.0" spacing="5.0">
+                <Label fx:id="playerDeckCountLabel" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Deck: ?/10" textFill="WHITE" />
+                <Label fx:id="playerTimerLabel" style="-fx-font-size: 14px;" text="Time: 42s" textFill="#adb5bd" />
+            </VBox>
+            </HBox>
+        </bottom>
+
+        <right>
+            <VBox alignment="TOP_CENTER" prefWidth="250.0" spacing="10.0" style="-fx-background-color: #2A2E33; -fx-padding: 10; -fx-border-color: #1E2124; -fx-border-width: 0 0 0 2;">
+                <Label text="Registo de Combate" textFill="WHITE">
+                    <font><Font name="System Bold" size="16.0" /></font>
+                </Label>
+
+                <TextArea fx:id="combatLogArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" style="-fx-control-inner-background: #1E2124; -fx-text-fill: white;" />
+
+                <Button fx:id="endTurnButton"
+                        mnemonicParsing="false"
+                        onAction="#handleEndTurn"
+                        prefHeight="50.0"
+                        prefWidth="200.0"
+                        style="-fx-font-size: 14px; -fx-padding: 5 15 5 15; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 30; -fx-font-weight: bold;"
+                        styleClass="menu-button"
+                        text="TERMINAR TURNO" />
+            </VBox>
+        </right>
+    </BorderPane>
+
+    <StackPane fx:id="pauseOverlay"
+               visible="false"
+               managed="false"
+               style="-fx-background-color: rgba(0, 0, 0, 0.65);">
+
+        <VBox alignment="CENTER"
+              spacing="20"
+              maxWidth="320"
+              maxHeight="300"
+              style="-fx-background-color: #2A2E33; -fx-background-radius: 16; -fx-padding: 35;">
+
+            <Label text="JOGO EM PAUSA"
+                   textFill="WHITE"
+                   style="-fx-font-size: 30px; -fx-font-weight: bold;" />
+
+            <Button text="Continuar"
+                    onAction="#handleResumeGame"
+                    prefWidth="220"
+                    style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #51cf66; -fx-text-fill: white; -fx-background-radius: 8;" />
+
+            <Button text="Reiniciar"
+                    onAction="#handleRestartGame"
+                    prefWidth="220"
+                    style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #4dabf7; -fx-text-fill: white; -fx-background-radius: 8;" />
+
+            <Button text="Sair"
+                    onAction="#handleExitApplication"
+                    prefWidth="220"
+                    style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #ff6b6b; -fx-text-fill: white; -fx-background-radius: 8;" />
+
         </VBox>
-        </HBox>
-    </bottom>
+    </StackPane>
 
-    <right>
-        <VBox alignment="TOP_CENTER" prefWidth="250.0" spacing="10.0" style="-fx-background-color: #2A2E33; -fx-padding: 10; -fx-border-color: #1E2124; -fx-border-width: 0 0 0 2;">
-            <Label text="Combat Logs" textFill="WHITE">
-                <font><Font name="System Bold" size="16.0" /></font>
-            </Label>
-
-            <TextArea fx:id="combatLogArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" style="-fx-control-inner-background: #1E2124; -fx-text-fill: white;" />
-
-            <Button fx:id="endTurnButton"
-                    mnemonicParsing="false"
-                    onAction="#handleEndTurn"
-                    prefHeight="50.0"
-                    prefWidth="200.0"
-                    style="-fx-font-size: 14px; -fx-padding: 5 15 5 15; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 30; -fx-font-weight: bold;"
-                    styleClass="menu-button"
-                    text="TERMINAR TURNO" />
-        </VBox>
-    </right>
-
-</BorderPane>
+</StackPane>

@@ -29,6 +29,7 @@ public class GameEngine {
 
     private final Consumer<String> logCallback;
 
+
     public GameEngine(String playerName, Consumer<String> logCallback) {
         this.humanPlayer = new HumanPlayer(playerName);
         this.aiPlayer    = new AiPlayer("AI - Oponente");
@@ -50,7 +51,7 @@ public class GameEngine {
         }
 
         humanPlayer.startTurn();
-        log("Jogo iniciado! Turno 1 — " + humanPlayer.getName() + " começa.");
+        log("Jogo iniciado! \nTurno 1 — " + humanPlayer.getName() + " começa.");
     }
 
     public void playCardFromHand(Card card) throws InsufficientManaException {
@@ -72,7 +73,7 @@ public class GameEngine {
 
     public void endHumanTurn() {
         if (!humanTurn || isGameOver) return;
-        log("Fim do teu turno.");
+        log("Fim do teu turno.\n");
 
         board.getUnits(PlayerType.PLAYER).forEach(UnitCard::resetAttackStatus);
         humanTurn = false;
@@ -95,7 +96,7 @@ public class GameEngine {
                 return;
             }
             humanTurn = true;
-            log("Turno " + turnNumber + " — " + humanPlayer.getName() + ".");
+            log("\nTurno " + turnNumber + " — " + humanPlayer.getName() + ".");
         }
     }
 
@@ -119,7 +120,7 @@ public class GameEngine {
                 log("[Oponente] " + card.play(aiPlayer, humanPlayer, board));
                 checkWinConditions();
                 if (isGameOver) return;
-            } catch (InsufficientManaException _) { /* skip */ }
+            } catch (InsufficientManaException _) {  }
         }
     }
 
