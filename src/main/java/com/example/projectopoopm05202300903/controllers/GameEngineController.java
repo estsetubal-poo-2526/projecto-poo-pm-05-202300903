@@ -14,7 +14,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -147,7 +146,7 @@ public class GameEngineController {
         try {
             engine.playCardFromHand(card);
             updateUI();
-        } catch (InsufficientManaException ex) {
+        } catch (InsufficientManaException _) {
             logMessage("Mana insuficiente!");
         }
     }
@@ -257,15 +256,13 @@ public class GameEngineController {
                 Scene scene = new Scene(root, currentWidth, currentHeight);
 
                 scene.setOnKeyPressed(event -> {
-                    switch (event.getCode()) {
-                        case F11 -> {
-                            stage.setFullScreenExitHint("");
-                            stage.setFullScreen(!stage.isFullScreen());
-                        }
-                        case ESCAPE -> {
-                            if (stage.isFullScreen()) {
-                                stage.setFullScreen(false);
-                            }
+                    if (event.getCode() == KeyCode.F11) {
+                        stage.setFullScreenExitHint("");
+                        stage.setFullScreen(!stage.isFullScreen());
+                    }
+                    else if (event.getCode() == KeyCode.ESCAPE) {
+                        if (stage.isFullScreen()) {
+                            stage.setFullScreen(false);
                         }
                     }
                 });
@@ -422,11 +419,9 @@ public class GameEngineController {
             Scene scene = new Scene(root, currentWidth, currentHeight);
 
             scene.setOnKeyPressed(event -> {
-                switch (event.getCode()) {
-                    case F11 -> {
-                        stage.setFullScreenExitHint("");
-                        stage.setFullScreen(!stage.isFullScreen());
-                    }
+                if (event.getCode() == KeyCode.F11) {
+                    stage.setFullScreenExitHint("");
+                    stage.setFullScreen(!stage.isFullScreen());
                 }
             });
 

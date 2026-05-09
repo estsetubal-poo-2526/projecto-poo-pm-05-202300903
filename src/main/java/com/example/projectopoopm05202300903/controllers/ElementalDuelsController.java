@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -34,15 +35,13 @@ public class ElementalDuelsController {
             Scene scene = new Scene(root, currentWidth, currentHeight);
 
             scene.setOnKeyPressed(keyEvent -> {
-                switch (keyEvent.getCode()) {
-                    case F11 -> {
-                        stage.setFullScreen(!stage.isFullScreen());
-                        stage.setFullScreenExitHint("");
-                    }
-                    case ESCAPE -> {
-                        if (stage.isFullScreen()) {
-                            stage.setFullScreen(false);
-                        }
+                if (keyEvent.getCode() == KeyCode.F11) {
+                    stage.setFullScreen(!stage.isFullScreen());
+                    stage.setFullScreenExitHint("");
+                }
+                else if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                    if (stage.isFullScreen()) {
+                        stage.setFullScreen(false);
                     }
                 }
             });
