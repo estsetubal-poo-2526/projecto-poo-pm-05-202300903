@@ -66,6 +66,8 @@ public abstract class Player implements ITarget {
     public int getCurrentHp()   { return currentHp; }
     public int getMaxMana()     { return maxMana; }
     public int getCurrentMana() { return currentMana; }
+    public int getManaLimit() { return MAX_MANA; }
     public Deck getDeck()       { return deck; }
     public Hand getHand()       { return hand; }
+
 }

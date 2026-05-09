@@ -10,8 +10,26 @@ import java.io.IOException;
 public class ElementalDuelsApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(ElementalDuelsApp.class.getResource("/com/example/projectopoopm05202300903/views/main-menu.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(
+                ElementalDuelsApp.class.getResource("/com/example/projectopoopm05202300903/views/main-menu.fxml")
+        );
+
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case F11 -> {
+                    stage.setFullScreenExitHint("");
+                    stage.setFullScreen(!stage.isFullScreen());
+                }
+                case ESCAPE -> {
+                    if (stage.isFullScreen()) {
+                        stage.setFullScreen(false);
+                    }
+                }
+            }
+        });
+
         stage.setTitle("Elemental Duels - Menu");
         stage.setScene(scene);
         stage.show();

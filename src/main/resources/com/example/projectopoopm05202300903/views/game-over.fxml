@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.projectopoopm05202300903.controllers.GameOverController"
+            style="-fx-background-color: #1E1F24;">
+
+    <center>
+        <VBox alignment="CENTER" spacing="25">
+            <padding>
+                <Insets top="40" right="40" bottom="40" left="40"/>
+            </padding>
+
+            <Label fx:id="resultTitleLabel"
+                   text="VITÓRIA!"
+                   style="-fx-font-size: 48px; -fx-font-weight: bold;"
+                   textFill="WHITE"/>
+
+            <Label fx:id="resultMessageLabel"
+                   text="Parabéns, venceste o duelo!"
+                   style="-fx-font-size: 20px;"
+                   textFill="#CED4DA"/>
+
+            <VBox alignment="CENTER" spacing="8"
+                  style="-fx-background-color: #2A2E33; -fx-background-radius: 12; -fx-padding: 20;">
+                <Label fx:id="winnerLabel"
+                       text="Vencedor: Jogador"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold;"
+                       textFill="WHITE"/>
+
+                <Label fx:id="playerHpLabel"
+                       text="HP Jogador: ?"
+                       style="-fx-font-size: 15px;"
+                       textFill="#ff6b6b"/>
+
+                <Label fx:id="aiHpLabel"
+                       text="HP PC: ?"
+                       style="-fx-font-size: 15px;"
+                       textFill="#ff6b6b"/>
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="12">
+                <Button text="Jogar Novamente"
+                        onAction="#handlePlayAgain"
+                        prefWidth="220"
+                        style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #4dabf7; -fx-text-fill: white; -fx-background-radius: 8;"/>
+
+                <Button text="Voltar ao Menu"
+                        onAction="#handleBackToMenu"
+                        prefWidth="220"
+                        style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #495057; -fx-text-fill: white; -fx-background-radius: 8;"/>
+            </VBox>
+        </VBox>
+    </center>
+
+</BorderPane>
