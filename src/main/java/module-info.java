@@ -1,6 +1,8 @@
 module com.example.projectopoopm05202300903 {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.desktop;
+    requires javafx.media;
 
     opens com.example.projectopoopm05202300903 to javafx.fxml;
     opens com.example.projectopoopm05202300903.controllers to javafx.fxml;
