@@ -1,5 +1,8 @@
 package com.example.projectopoopm05202300903.controllers;
 
+import com.example.projectopoopm05202300903.SoundManager;
+import com.example.projectopoopm05202300903.SoundManager.SoundType;
+
 import com.example.projectopoopm05202300903.models.card.Card;
 import com.example.projectopoopm05202300903.models.card.UnitCard;
 import com.example.projectopoopm05202300903.models.enums.PlayerType;
@@ -65,15 +68,6 @@ public class GameEngineController {
     private boolean gameOverShown = false;
     private boolean paused = false;
 
-    private AudioClip openingSound;
-    private AudioClip buttonClickSound;
-    private AudioClip playCardSound;
-
-    private enum SoundType {
-        OPENING,
-        BUTTON_CLICK,
-        PLAY_CARD
-    }
 
     @FXML
     public void initialize() {
@@ -87,8 +81,7 @@ public class GameEngineController {
         startTurnTimer();
         setupPauseMenuShortcut();
 
-        loadSounds();
-        playSound(SoundType.OPENING, 2);
+        SoundManager.playSound(SoundType.OPENING, 3);
     }
 
     private void updateUI() {
@@ -159,7 +152,7 @@ public class GameEngineController {
         if (paused || !engine.isHumanTurn() || engine.isGameOver()) return;
         clearBoardSelection();
         try {
-            playSound(SoundType.PLAY_CARD, 3);
+            SoundManager.playSound(SoundType.PLAY_CARD, 3);
             engine.playCardFromHand(card);
             updateUI();
         } catch (InsufficientManaException _) {
@@ -212,7 +205,7 @@ public class GameEngineController {
         clearBoardSelection();
         engine.endHumanTurn();
         updateUI();
-        playSound(SoundType.BUTTON_CLICK, 2);
+        SoundManager.playSound(SoundType.BUTTON_CLICK, 2);
 
         if (!engine.isGameOver()) {
             startTurnTimer();
@@ -407,13 +400,13 @@ public class GameEngineController {
 
     @FXML
     private void handleResumeGame() {
-        playSound(SoundType.BUTTON_CLICK, 1);
+        SoundManager.playSound(SoundType.BUTTON_CLICK, 1);
         resumeGame();
     }
 
     @FXML
     private void handleRestartGame() {
-        playSound(SoundType.BUTTON_CLICK, 1);
+        SoundManager.playSound(SoundType.BUTTON_CLICK, 1);
         changeScene("/com/example/projectopoopm05202300903/views/game-arena.fxml");
     }
 
@@ -461,44 +454,6 @@ public class GameEngineController {
         } catch (IOException e) {
             System.out.println("Erro ao mudar de página: " + e.getMessage());
             e.printStackTrace();
-        }
-    }
-
-
-    private AudioClip loadSound(String fileName) {
-        String path = Objects.requireNonNull(getClass().getResource(
-                "/com/example/projectopoopm05202300903/sounds/" + fileName
-        )).toExternalForm();
-
-        return new AudioClip(path);
-    }
-
-    private void loadSounds() {
-        openingSound = loadSound("opening_sound.mp3");
-        buttonClickSound = loadSound("click_effect.mp3");
-        playCardSound = loadSound("play_card_sound.mp3");
-    }
-
-    private void playSound(SoundType soundType, double secondsToPlay) {
-        AudioClip sound;
-
-        switch (soundType) {
-            case OPENING -> sound = openingSound;
-            case BUTTON_CLICK -> sound = buttonClickSound;
-            case PLAY_CARD -> sound = playCardSound;
-            default -> sound = null;
-        }
-
-        if (sound == null) return;
-
-        sound.play();
-
-        if (secondsToPlay > 0) {
-            Timeline stopSoundTimer = new Timeline(
-                    new KeyFrame(Duration.seconds(secondsToPlay), event -> sound.stop())
-            );
-
-            stopSoundTimer.play();
         }
     }
 }
