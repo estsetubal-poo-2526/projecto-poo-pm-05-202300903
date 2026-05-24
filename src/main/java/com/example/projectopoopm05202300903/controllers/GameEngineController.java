@@ -27,9 +27,13 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import javafx.scene.media.AudioClip;
 import java.io.IOException;
-import java.util.Objects;
+
+import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
+import javafx.scene.Node;
 
 public class GameEngineController {
 
@@ -115,7 +119,7 @@ public class GameEngineController {
             CardView cardView = new CardView(card, false, false);
             boolean canAfford = card.getManaCost() <= engine.getHumanPlayer().getCurrentMana();
             if (!canAfford) cardView.setOpacity(0.45);
-            cardView.setOnMouseClicked(event -> onHandCardClicked(card));
+            cardView.setOnMouseClicked(event -> onHandCardClicked(card, cardView));
             playerHandBox.getChildren().add(cardView);
         }
 
@@ -148,16 +152,66 @@ public class GameEngineController {
                 ? javafx.scene.Cursor.HAND : javafx.scene.Cursor.DEFAULT);
     }
 
-    private void onHandCardClicked(Card card) {
+    private void onHandCardClicked(Card card, CardView cardView) {
         if (paused || !engine.isHumanTurn() || engine.isGameOver()) return;
+
         clearBoardSelection();
-        try {
-            SoundManager.playSound(SoundType.PLAY_CARD, 3);
-            engine.playCardFromHand(card);
-            updateUI();
-        } catch (InsufficientManaException _) {
+
+        if (card.getManaCost() > engine.getHumanPlayer().getCurrentMana()) {
             logMessage("Mana insuficiente!");
+            return;
         }
+
+        endTurnButton.setDisable(true);
+        playerHandBox.setDisable(true);
+
+        playCardAnimation(cardView, () -> {
+            try {
+                SoundManager.playSound(SoundType.PLAY_CARD, 3);
+                engine.playCardFromHand(card);
+            } catch (InsufficientManaException _) {
+                logMessage("Mana insuficiente!");
+            } finally {
+                playerHandBox.setDisable(false);
+                updateUI();
+            }
+        });
+    }
+
+    private void playCardAnimation(Node cardNode, Runnable onFinished) {
+        double cardSceneX = cardNode.localToScene(cardNode.getBoundsInLocal()).getMinX();
+        double cardSceneY = cardNode.localToScene(cardNode.getBoundsInLocal()).getMinY();
+
+        double boardSceneX = playerBoardBox.localToScene(playerBoardBox.getBoundsInLocal()).getMinX()
+                + playerBoardBox.getWidth() / 2;
+
+        double boardSceneY = playerBoardBox.localToScene(playerBoardBox.getBoundsInLocal()).getMinY()
+                + playerBoardBox.getHeight() / 2;
+
+        TranslateTransition move = new TranslateTransition(Duration.millis(400), cardNode);
+        move.setByX(boardSceneX - cardSceneX);
+        move.setByY(boardSceneY - cardSceneY);
+
+        ScaleTransition scale = new ScaleTransition(Duration.millis(400), cardNode);
+        scale.setToX(1.2);
+        scale.setToY(1.2);
+
+        FadeTransition fade = new FadeTransition(Duration.millis(400), cardNode);
+        fade.setToValue(0.15);
+
+        ParallelTransition animation = new ParallelTransition(move, scale, fade);
+
+        animation.setOnFinished(event -> {
+            cardNode.setTranslateX(0);
+            cardNode.setTranslateY(0);
+            cardNode.setScaleX(1);
+            cardNode.setScaleY(1);
+            cardNode.setOpacity(1);
+
+            onFinished.run();
+        });
+
+        animation.play();
     }
 
     private void onPlayerBoardUnitClicked(CardView cardView, UnitCard unit) {
