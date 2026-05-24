@@ -1,5 +1,8 @@
 package com.example.projectopoopm05202300903.controllers;
 
+import com.example.projectopoopm05202300903.SoundManager;
+import com.example.projectopoopm05202300903.SoundManager.SoundType;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,10 +27,12 @@ public class GameOverController {
         this.playerWon = playerWon;
 
         if (playerWon) {
+            SoundManager.playSound(SoundType.WIN, 3);
             resultTitleLabel.setText("VITÓRIA!");
             resultTitleLabel.setTextFill(javafx.scene.paint.Color.web("#51cf66"));
             resultMessageLabel.setText("Parabéns, " + winnerName + "! Venceste o duelo!");
         } else {
+            SoundManager.playSound(SoundType.DEFEAT, 3);
             resultTitleLabel.setText("DERROTA!");
             resultTitleLabel.setTextFill(javafx.scene.paint.Color.web("#ff6b6b"));
             resultMessageLabel.setText("O PC venceu desta vez...");
@@ -40,11 +45,13 @@ public class GameOverController {
 
     @FXML
     private void handlePlayAgain() {
+        SoundManager.playSound(SoundType.BUTTON_CLICK, 2);
         changeScene("/com/example/projectopoopm05202300903/views/game-arena.fxml");
     }
 
     @FXML
     private void handleBackToMenu() {
+        SoundManager.playSound(SoundType.BUTTON_CLICK, 2);
         changeScene("/com/example/projectopoopm05202300903/views/main-menu.fxml");
     }
 

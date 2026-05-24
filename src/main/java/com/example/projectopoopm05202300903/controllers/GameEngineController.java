@@ -1,5 +1,8 @@
 package com.example.projectopoopm05202300903.controllers;
 
+import com.example.projectopoopm05202300903.SoundManager;
+import com.example.projectopoopm05202300903.SoundManager.SoundType;
+
 import com.example.projectopoopm05202300903.models.card.Card;
 import com.example.projectopoopm05202300903.models.card.UnitCard;
 import com.example.projectopoopm05202300903.models.enums.PlayerType;
@@ -25,6 +28,12 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+
+import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
+import javafx.scene.Node;
 
 public class GameEngineController {
 
@@ -63,6 +72,7 @@ public class GameEngineController {
     private boolean gameOverShown = false;
     private boolean paused = false;
 
+
     @FXML
     public void initialize() {
         engine = new GameEngine("Jogador", this::logMessage);
@@ -74,6 +84,8 @@ public class GameEngineController {
         updateUI();
         startTurnTimer();
         setupPauseMenuShortcut();
+
+        SoundManager.playSound(SoundType.OPENING, 3);
     }
 
     private void updateUI() {
@@ -107,7 +119,7 @@ public class GameEngineController {
             CardView cardView = new CardView(card, false, false);
             boolean canAfford = card.getManaCost() <= engine.getHumanPlayer().getCurrentMana();
             if (!canAfford) cardView.setOpacity(0.45);
-            cardView.setOnMouseClicked(event -> onHandCardClicked(card));
+            cardView.setOnMouseClicked(event -> onHandCardClicked(card, cardView));
             playerHandBox.getChildren().add(cardView);
         }
 
@@ -140,15 +152,66 @@ public class GameEngineController {
                 ? javafx.scene.Cursor.HAND : javafx.scene.Cursor.DEFAULT);
     }
 
-    private void onHandCardClicked(Card card) {
+    private void onHandCardClicked(Card card, CardView cardView) {
         if (paused || !engine.isHumanTurn() || engine.isGameOver()) return;
+
         clearBoardSelection();
-        try {
-            engine.playCardFromHand(card);
-            updateUI();
-        } catch (InsufficientManaException _) {
+
+        if (card.getManaCost() > engine.getHumanPlayer().getCurrentMana()) {
             logMessage("Mana insuficiente!");
+            return;
         }
+
+        endTurnButton.setDisable(true);
+        playerHandBox.setDisable(true);
+
+        playCardAnimation(cardView, () -> {
+            try {
+                SoundManager.playSound(SoundType.PLAY_CARD, 3);
+                engine.playCardFromHand(card);
+            } catch (InsufficientManaException _) {
+                logMessage("Mana insuficiente!");
+            } finally {
+                playerHandBox.setDisable(false);
+                updateUI();
+            }
+        });
+    }
+
+    private void playCardAnimation(Node cardNode, Runnable onFinished) {
+        double cardSceneX = cardNode.localToScene(cardNode.getBoundsInLocal()).getMinX();
+        double cardSceneY = cardNode.localToScene(cardNode.getBoundsInLocal()).getMinY();
+
+        double boardSceneX = playerBoardBox.localToScene(playerBoardBox.getBoundsInLocal()).getMinX()
+                + playerBoardBox.getWidth() / 2;
+
+        double boardSceneY = playerBoardBox.localToScene(playerBoardBox.getBoundsInLocal()).getMinY()
+                + playerBoardBox.getHeight() / 2;
+
+        TranslateTransition move = new TranslateTransition(Duration.millis(400), cardNode);
+        move.setByX(boardSceneX - cardSceneX);
+        move.setByY(boardSceneY - cardSceneY);
+
+        ScaleTransition scale = new ScaleTransition(Duration.millis(400), cardNode);
+        scale.setToX(1.2);
+        scale.setToY(1.2);
+
+        FadeTransition fade = new FadeTransition(Duration.millis(400), cardNode);
+        fade.setToValue(0.15);
+
+        ParallelTransition animation = new ParallelTransition(move, scale, fade);
+
+        animation.setOnFinished(event -> {
+            cardNode.setTranslateX(0);
+            cardNode.setTranslateY(0);
+            cardNode.setScaleX(1);
+            cardNode.setScaleY(1);
+            cardNode.setOpacity(1);
+
+            onFinished.run();
+        });
+
+        animation.play();
     }
 
     private void onPlayerBoardUnitClicked(CardView cardView, UnitCard unit) {
@@ -196,6 +259,7 @@ public class GameEngineController {
         clearBoardSelection();
         engine.endHumanTurn();
         updateUI();
+        SoundManager.playSound(SoundType.BUTTON_CLICK, 2);
 
         if (!engine.isGameOver()) {
             startTurnTimer();
@@ -390,11 +454,13 @@ public class GameEngineController {
 
     @FXML
     private void handleResumeGame() {
+        SoundManager.playSound(SoundType.BUTTON_CLICK, 1);
         resumeGame();
     }
 
     @FXML
     private void handleRestartGame() {
+        SoundManager.playSound(SoundType.BUTTON_CLICK, 1);
         changeScene("/com/example/projectopoopm05202300903/views/game-arena.fxml");
     }
 
